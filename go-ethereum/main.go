@@ -1,6 +1,6 @@
 package main
 
-import "go-neon-devnet/deploy"
+import "go-ethereum/deploy"
 
 func main() {
 	contractAddress := deploy.DeployStorageContract()
