@@ -11,7 +11,12 @@ For more details, please refer to these documentations https://goethereumbook.or
 
 ## Prerequisites
 
-To use this project, Go must be installed on the machine.
+1. The latest Go version.
+2. Solidity compiler version <= 0.8.24 (Neon EVM supports solidity <= 0.8.24).
+
+### Solc installation
+
+Check this link to install the required solc version - https://docs.soliditylang.org/en/latest/installing-solidity.html.
 
 ### Go installation
 
@@ -128,4 +133,28 @@ Transaction hash: 0x8d2ff2a94f836b25e3ae9cc2f9b95ca73e3b3c1e4a6bf7725890eddd9150
 
 Sender balance after transfer 999999999999999999990
 Receiver balance after transfer 10
+```
+
+<br><br><br>
+
+## Steps to deploy your own smart contract and generate the go bindings
+
+1. Place your smart contract in the `contracts` directory.
+
+2. Generate ABI for the smart contract.
+
+```sh
+solc --abi ./contracts/Example.sol -o build
+```
+
+3. Generate bytecode for the smart contract.
+
+```sh
+solc --bin ./contracts/Example.sol -o build
+```
+
+4. Generate the go binding for the smart contract.
+
+```sh
+abigen --abi ./build/Example.abi --pkg contractsgo --type Example --out ./contractsgo/Example.go --bin ./build/Example.bin
 ```
