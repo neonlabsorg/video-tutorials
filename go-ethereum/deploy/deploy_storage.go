@@ -10,47 +10,21 @@ import (
 	"go-ethereum/contractsgo"
 
 	"github.com/defiweb/go-eth/abi"
-	"github.com/defiweb/go-eth/hexutil"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-// GetNextTransaction returns the next transaction in the pending transaction queue
-// NOTE: this is not an optimized way
-func GetNextTransaction() (*bind.TransactOpts, *ethclient.Client, common.Address, uint64, *big.Int, error) {
-	client, chainID, fromAddress, privateKey := connection.Connection()
-    
-    nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    gasPrice, err := client.SuggestGasPrice(context.Background())
-    if err != nil {
-        log.Fatal(err)
-    }
-
-	// sign the transaction
-	auth, err := bind.NewKeyedTransactorWithChainID(privateKey, chainID)
-	if err != nil {
-		return nil, client, fromAddress, nonce, gasPrice, err
-	}
-
-	return auth, client, fromAddress, nonce, gasPrice, nil
-}
-
 func DeployStorageContract() (string) {
-	auth, client, fromAddress, nonce, gasPrice, _ := GetNextTransaction()
+	auth, client, fromAddress, nonce, gasPrice, _ := connection.GetNextTransaction()
 
 	fmt.Println("Deploying Storage contract...")
 
 	auth.From = fromAddress
 	auth.Nonce = big.NewInt(int64(nonce))
-	auth.Value = big.NewInt(0)             // in wei
-	auth.GasLimit = uint64(30000000)        // in units
-	auth.GasPrice = gasPrice // in wei
+	auth.Value = big.NewInt(0)
+	auth.GasLimit = uint64(30000000)
+	auth.GasPrice = gasPrice
 
 	address, tx, _, err := contractsgo.DeployStorage(auth, client)
     if err != nil {
@@ -68,8 +42,8 @@ func DeployStorageContract() (string) {
 	return address.String()
 }
 
-func WriteStorageContract(contractAddress string, value int64) {
-	auth, client, fromAddress, nonce, gasPrice, _ := GetNextTransaction()
+func StoreValue(contractAddress string, value int64) {
+	auth, client, fromAddress, nonce, gasPrice, _ := connection.GetNextTransaction()
 
 	fmt.Println("Storing value in the Storage contract...")
 
@@ -80,14 +54,12 @@ func WriteStorageContract(contractAddress string, value int64) {
 	if err != nil {
 		panic(err)
 	}
-	// Print encoded data.
-	fmt.Printf("Encoded data: %s\n", hexutil.BytesToHex(abiData))
 
-	toAddress := common.HexToAddress(contractAddress) //"0xa0D774bbf8193388f98D7FDfA763e6B3f41A8E56"
+	toContractAddress := common.HexToAddress(contractAddress)
 
 	callMsg := ethereum.CallMsg {
 		From: fromAddress,
-		To: &toAddress,
+		To: &toContractAddress,
 		GasPrice: gasPrice,
         Value: big.NewInt(0),
 		Data: abiData,
@@ -106,11 +78,11 @@ func WriteStorageContract(contractAddress string, value int64) {
 
 	auth.From = fromAddress
 	auth.Nonce = big.NewInt(int64(nonce))
-	auth.Value = big.NewInt(0)             // in wei
-	auth.GasLimit = gasLimit       // in units
-	auth.GasPrice = gasPrice // in wei
+	auth.Value = big.NewInt(0)
+	auth.GasLimit = gasLimit
+	auth.GasPrice = gasPrice
 
-	// Call the store() function
+	// Call the store function from the smart contract
 	tx, err := storage.Store(auth, big.NewInt(value))
 	if err != nil {
 		log.Fatalf("Failed to update value: %v", err)
@@ -123,8 +95,8 @@ func WriteStorageContract(contractAddress string, value int64) {
 	fmt.Printf("Transaction hash: 0x%x\n\n", tx.Hash())	
 }
 
-func ReadStorageContract(contractAddress string) {
-	_, client, _, _, _, _ := GetNextTransaction()
+func ReadValue(contractAddress string) {
+	_, client, _, _, _, _ := connection.GetNextTransaction()
 
 	fmt.Println("Reading value from the Storage contract...")
 
@@ -138,4 +110,5 @@ func ReadStorageContract(contractAddress string) {
 		log.Fatalf("Failed to retrieve value: %v", err)
 	}
 	fmt.Println("Returned value:", value)
+	fmt.Println()
 }

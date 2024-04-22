@@ -1,8 +1,13 @@
 # Ethereum-based dApp Development with Go using go-ethereum SDK
 
-# Example deploying a simple storage contract to Neon EVM Devnet using Go
+# Examples deploying smart contracts on Neon EVM Devnet using Go
 
-This directory contains all the files necessary to deploy simple storage contract on Neon EVM using Go. For more details, please refer to these documentations https://goethereumbook.org/en/ and https://geth.ethereum.org/docs/developers/dapp-developer/native-bindings.
+This directory contains all the files necessary to deploy the following smart contracts on Neon EVM Devnet-
+
+1. Simple storage contract.
+2. ERC20 token contract.
+
+For more details, please refer to these documentations https://goethereumbook.org/en/ and https://geth.ethereum.org/docs/developers/dapp-developer/native-bindings.
 
 ## Prerequisites
 
@@ -59,6 +64,9 @@ go mod tidy
 
 Rename `.env.example` to `.env` and place your private key inside it.
 
+> [!IMPORTANT]
+> If you want to deploy only one of the smart contracts, then please comment out the other smart contract function calls in the `main.go` file.
+
 ## Interact with the **Storage** smart contract
 
 Run the following command to deploy the Storage contract, store a value in the deployed smart contract and reading the value from the deployed smart contract.
@@ -71,20 +79,53 @@ After successfully running this step you should get console output similar to:
 
 ```sh
 You are now connected to Neon EVM Devnet
-The NEON balance of the account is: 314473436236074797113362
+The NEON balance of the account is: 310387553758242748088682
+------------------------------------------------------------------------
 Deploying Storage contract...
-The contract is deployed at address:  0x259Ab4d9d645CFC89b7d340bAb926cD297952945
-Transaction hash: 0x9f47e21b2515e8890ff51969f3cfb28ff448cc654fca80da978c55b892dff7b6
+The contract is deployed at address:  0x6b6Ba862e2bBc0C1305DF681d45f16a1D6F57baf
+Transaction hash: 0xf84667ce0bd5d2da4dfcf81fe9c72bdc81c207a41a3c9baa4c43e9ebb6ae1b6e
 
 You are now connected to Neon EVM Devnet
-The NEON balance of the account is: 314469132020646818818162
+The NEON balance of the account is: 310383249542814769793482
+------------------------------------------------------------------------
 Storing value in the Storage contract...
-Encoded data: 0x6057361d000000000000000000000000000000000000000000000000000000000000002d
 Estimated gas: 25000
-Transaction hash: 0x54fc126f2d04ad4432094f14bf60b15fc235b5667c40713e71699f28b6c300b4
+Transaction hash: 0x24e5af83df1e9f1536d684c08e903d1285f1f5e484df43d4616c925bb25ec9a9
 
 You are now connected to Neon EVM Devnet
-The NEON balance of the account is: 314469129760694164148162
+The NEON balance of the account is: 310383247282862115123482
+------------------------------------------------------------------------
 Reading value from the Storage contract...
 Returned value: 45
+```
+
+## Interact with the **TestERC20** smart contract
+
+Run the following command to deploy the Test ERC20 token contract, store a value in the deployed smart contract and reading the value from the deployed smart contract.
+
+```sh
+go run main.go
+```
+
+After successfully running this step you should get console output similar to:
+
+```sh
+You are now connected to Neon EVM Devnet
+The NEON balance of the account is: 310383247282862115123482
+------------------------------------------------------------------------
+Deploying TestERC20 contract...
+The contract is deployed at address:  0x7BeE8180c4f35744C9cC811e540252ECcD8AcEb4
+Transaction hash: 0xf8af65bcb8187bcdcc8c7a5a7106f242c941d6506201497f31f46099d891bcc6
+
+You are now connected to Neon EVM Devnet
+The NEON balance of the account is: 310373551028315738437922
+------------------------------------------------------------------------
+Transferring TestERC20 tokens...
+Estimated gas: 1422000
+Sender balance before transfer 1000000000000000000000
+Receiver balance before transfer 0
+Transaction hash: 0x8d2ff2a94f836b25e3ae9cc2f9b95ca73e3b3c1e4a6bf7725890eddd915029ab
+
+Sender balance after transfer 999999999999999999990
+Receiver balance after transfer 10
 ```

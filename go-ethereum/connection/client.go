@@ -8,6 +8,7 @@ import (
 	"math/big"
 	"os"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -59,6 +60,47 @@ func Connection() (*ethclient.Client, *big.Int, common.Address, *ecdsa.PrivateKe
         log.Fatal(err)
     }
     fmt.Println("The NEON balance of the account is:", balance)
+    fmt.Println("------------------------------------------------------------------------")
 
     return client, chainID, fromAddress, privateKey
+}
+
+// GetNextTransaction returns the next transaction in the pending transaction queue
+func GetNextTransaction() (*bind.TransactOpts, *ethclient.Client, common.Address, uint64, *big.Int, error) {
+	client, chainID, fromAddress, privateKey := Connection()
+    
+    nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    gasPrice, err := client.SuggestGasPrice(context.Background())
+    if err != nil {
+        log.Fatal(err)
+    }
+
+	// sign the transaction
+	auth, err := bind.NewKeyedTransactorWithChainID(privateKey, chainID)
+	if err != nil {
+		return nil, client, fromAddress, nonce, gasPrice, err
+	}
+
+	return auth, client, fromAddress, nonce, gasPrice, nil
+}
+
+func GenerateNewWallet() (common.Address) {
+    privateKey, err := crypto.GenerateKey()
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    publicKey := privateKey.Public()
+    publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+    if !ok {
+        log.Fatal("Error casting public key to ECDSA")
+    }
+
+    address := crypto.PubkeyToAddress(*publicKeyECDSA)
+
+    return address
 }
