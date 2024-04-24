@@ -16,7 +16,6 @@ import (
 )
 
 func GoDotEnvVariable(key string) string {
-
     // load .env file
     err := godotenv.Load(".env")
   
@@ -28,7 +27,7 @@ func GoDotEnvVariable(key string) string {
 }
 
 func Connection() (*ethclient.Client, *big.Int, common.Address, *ecdsa.PrivateKey) {
-    client, err := ethclient.Dial("https://devnet.neonevm.org")
+    client, err := ethclient.Dial(GoDotEnvVariable("NEON_RPC_DEVNET"))
     if err != nil {
         log.Fatal(err)
     }
