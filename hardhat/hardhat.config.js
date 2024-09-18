@@ -1,4 +1,5 @@
 require("@nomicfoundation/hardhat-toolbox");
+//require("@nomicfoundation/hardhat-ethers");
 require("dotenv").config();
 
 /** @type import('hardhat/config').HardhatUserConfig */
@@ -50,12 +51,17 @@ module.exports = {
       gasPrice: "auto",
     },
     neonmainnet: {
-      url: "https://neon-proxy-mainnet.solana.p2p.org",
+      url: "https://neon-mainnet.everstake.one",
       accounts: [process.env.PRIVATE_KEY_OWNER, process.env.USER1_KEY],
       chainId: 245022934,
       allowUnlimitedContractSize: false,
       gas: "auto",
       gasPrice: "auto",
+    },
+    sepolia: {
+      chainId: 11155111,
+      url: process.env.SEPOLIA_URL,
+      accounts: [process.env.PRIVATE_KEY_OWNER, process.env.USER1_KEY],
     },
   },
 };
